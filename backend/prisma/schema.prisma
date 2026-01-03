@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  CONNECTOR
+  SMALL_GROUP_LEADER
+  VIEWER
+}
+
+enum ContactSource {
+  SUNDAY_SERVICE
+  COMMUNITY_EVENT
+  CAFE
+  WEBSITE
+  INSTAGRAM
+}
+
+enum ContactClassification {
+  VIP_CHRISTIAN
+  NAME_CHRISTIAN
+}
+
+enum TaskStatus {
+  PENDING
+  COMPLETED
+  ALREADY_IN_SMALL_GROUP
+  CONTACT_ENDED
+  RESCHEDULED
+}
+
+enum WorkflowWeek {
+  WEEK_1
+  WEEK_2
+  WEEK_3
+  WEEK_4
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(VIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  createdContacts Contact[] @relation("ContactCreator")
+  assignedTasks   Task[]
+  smallGroup      SmallGroupLeader?
+}
+
+model MissionPoint {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  kpis KPI[]
+}
+
+model KPI {
+  id            String      @id @default(cuid())
+  name          String
+  description   String?
+  missionPointId String
+  missionPoint  MissionPoint @relation(fields: [missionPointId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  records KPIRecord[]
+}
+
+model KPIRecord {
+  id        String   @id @default(cuid())
+  kpiId     String
+  kpi       KPI      @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+  value     Float
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kpiId, date])
+}
+
+model Contact {
+  id               String               @id @default(cuid())
+  name             String
+  email            String?
+  phone            String?
+  district         String?
+  area             String?
+  source           ContactSource
+  classification   ContactClassification
+  registeredForSmallGroup Boolean        @default(false)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  creatorId        String?
+  creator          User?                @relation("ContactCreator", fields: [creatorId], references: [id])
+
+  workflowProgress WorkflowProgress?
+}
+
+model SmallGroupLeader {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  whatsapp  String?
+  groupName String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkflowProgress {
+  id              String      @id @default(cuid())
+  contactId       String      @unique
+  contact         Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  currentWeek     WorkflowWeek @default(WEEK_1)
+  startDate       DateTime    @default(now())
+  completed       Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  tasks           Task[]
+}
+
+model Task {
+  id                String     @id @default(cuid())
+  workflowProgressId String
+  workflowProgress  WorkflowProgress @relation(fields: [workflowProgressId], references: [id], onDelete: Cascade)
+  assignedToId      String
+  assignedTo        User       @relation(fields: [assignedToId], references: [id])
+  week              WorkflowWeek
+  taskType          String     // "MESSAGE", "REMINDER", "STATUS_CHECK"
+  description       String
+  dueDate           DateTime
+  status            TaskStatus @default(PENDING)
+  completedAt       DateTime?
+  notes             String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  @@index([assignedToId, status])
+  @@index([workflowProgressId])
+}
