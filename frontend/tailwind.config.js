@@ -34,6 +34,38 @@ export default {
         '2xl': '40rem',
       },
       colors: {
+        // Reallife Berlin Corporate Colors
+        reallife: {
+          50: '#f0f7ff',
+          100: '#e0efff',
+          200: '#b8ddff',
+          300: '#7bc2ff',
+          400: '#369eff',
+          500: '#0d7aff', // Primary brand blue - warm and welcoming
+          600: '#005ce6',
+          700: '#0047b3',
+          800: '#003786',
+          900: '#002d5c',
+        },
+        // Warm accent color for highlights
+        accent: {
+          50: '#fef3f2',
+          100: '#fde4e1',
+          200: '#fbcec8',
+          300: '#f8a8a0',
+          400: '#f4756a',
+          500: '#f04a3c', // Warm red accent
+          600: '#de2e1f',
+          700: '#b92316',
+          800: '#981f15',
+          900: '#7d1f17',
+        },
+        // Berlin-inspired colors (from flag)
+        berlin: {
+          red: '#FF0000',
+          black: '#000000',
+          white: '#FFFFFF',
+        },
         blue: {
           50: '#eff6ff',
           100: '#dbeafe',

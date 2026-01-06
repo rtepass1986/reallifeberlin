@@ -1,193 +1,448 @@
 # Reallife Church App
 
-A comprehensive application for managing church KPIs and the Connect Process workflow.
+Eine vollständige Full-Stack-Anwendung für die Verwaltung von KPIs und den Connect-Prozess der Reallife Kirche.
 
-## Features
+## 📋 Inhaltsverzeichnis
 
-### 1. KPI Reporting Dashboard
-- Track KPIs for mission points (Wir gehen, Wir bringen, Wir begleiten)
-- Create and manage KPIs individually for each mission point
-- Visualize KPI data in modular dashboards
-- Track trends over time
+- [Übersicht](#übersicht)
+- [Features](#features)
+- [Was ist implementiert](#was-ist-implementiert)
+- [Was noch zu tun ist](#was-noch-zu-tun-ist)
+- [Technologie-Stack](#technologie-stack)
+- [Setup](#setup)
+- [Projektstruktur](#projektstruktur)
+- [API-Dokumentation](#api-dokumentation)
 
-### 2. Connect Process Management
-- Contact form/data collection
-- Automated 4-week follow-up workflow
-- Task management with notifications
-- Status tracking (Completed, Already in small group, Contact ended, Reschedule)
-- WhatsApp integration for small group leaders
-- API integrations (Planning Center, Peoples App, WhatsApp)
+## 🎯 Übersicht
 
-## Tech Stack
+Diese Anwendung besteht aus zwei Hauptkomponenten:
 
-- **Backend**: Node.js, Express, TypeScript, Prisma
-- **Frontend**: React, TypeScript, Vite, Tailwind CSS, Recharts
-- **Database**: PostgreSQL
-- **Authentication**: JWT
+1. **KPI Dashboard** - Verwaltung und Visualisierung von KPIs für Mission Points
+2. **Connect Prozess** - Automatisierter 4-Wochen-Follow-up-Workflow für neue Kontakte
 
-## Setup
+## ✨ Features
 
-### Prerequisites
-- Node.js 18+
-- PostgreSQL database (or Docker for easy setup)
-- npm or yarn
-- Docker & Docker Compose (optional, for database)
+### KPI Management
+- ✅ Mission Points verwalten (Wir gehen, Wir bringen, Wir begleiten)
+- ✅ KPIs unter jedem Mission Point erstellen
+- ✅ KPI-Werte erfassen und verfolgen
+- ✅ Dashboard mit Visualisierungen
+- ✅ Trend-Analysen für KPIs
+
+### Connect Prozess
+- ✅ Kontaktformular mit allen erforderlichen Feldern
+- ✅ Automatischer 4-Wochen-Workflow
+- ✅ Task-Management für Connectors
+- ✅ Status-Tracking (Completed, Already in Small Group, Contact Ended, Reschedule)
+- ✅ Benachrichtigungssystem (Struktur vorhanden)
+- ✅ WhatsApp-Integration für Kleingruppenleiter
+
+## ✅ Was ist implementiert
+
+### Backend
+
+#### Datenbank & Schema
+- ✅ PostgreSQL-Datenbank mit Prisma ORM
+- ✅ Vollständiges Datenbankschema:
+  - User (mit Rollen: ADMIN, CONNECTOR, SMALL_GROUP_LEADER, VIEWER)
+  - MissionPoint
+  - KPI & KPIRecord
+  - Contact (mit Quellen und Klassifizierung)
+  - WorkflowProgress
+  - Task (mit Status-Tracking)
+  - SmallGroupLeader
+
+#### API Routes
+- ✅ `/api/auth` - Authentifizierung (lokale Login + Planning Center OAuth)
+- ✅ `/api/mission-points` - CRUD für Mission Points
+- ✅ `/api/kpis` - CRUD für KPIs und KPI Records
+- ✅ `/api/contacts` - CRUD für Kontakte
+- ✅ `/api/tasks` - Task-Verwaltung und Status-Updates
+- ✅ `/api/workflows` - Workflow-Verwaltung
+- ✅ `/api/dashboard` - Dashboard-Daten und Statistiken
+
+#### Services
+- ✅ `workflowService.ts` - 4-Wochen-Workflow-Erstellung
+  - Week 1: Montag-Nachricht + Donnerstag-Erinnerung
+  - Weeks 2-4: Donnerstag-Erinnerungen
+  - Week 4: Status-Check
+- ✅ `notificationService.ts` - Benachrichtigungssystem
+  - Peoples App API Integration (Struktur)
+  - WhatsApp API Integration (Struktur)
+  - Fallback-Logging
+- ✅ `cronService.ts` - Automatisierte Cron Jobs
+  - Tägliche Task-Checks (8:00 Uhr)
+  - Wöchentliche Workflow-Fortschritte (Montag 9:00 Uhr)
+- ✅ `planningCenterAuth.ts` - Planning Center OAuth
+- ✅ `planningCenterService.ts` - Planning Center API Integration
+
+#### Middleware
+- ✅ JWT-Authentifizierung
+- ✅ Rollenbasierte Autorisierung
+
+### Frontend
+
+#### Seiten
+- ✅ **Dashboard** (`/`) - Übersicht mit Statistiken und Mission Points
+- ✅ **KPI Verwaltung** (`/kpis`) - KPIs erstellen und verwalten
+- ✅ **Connect Prozess** (`/connect`) - Kontakte und Tasks verwalten
+- ✅ **Login** (`/login`) - Anmeldung (lokal + Planning Center)
+
+#### Komponenten
+- ✅ Layout mit Navigation
+- ✅ Responsive Design mit Tailwind CSS
+- ✅ Deutsche Benutzeroberfläche
+
+#### State Management
+- ✅ Zustand Store für Authentifizierung
+- ✅ API Client mit Axios
+
+### Docker & Deployment
+- ✅ Docker Compose für PostgreSQL
+- ✅ Automatische Datenbankinitialisierung
+- ✅ Environment-Variablen-Konfiguration
+
+## 🚧 Was noch zu tun ist
+
+### Hochpriorität (Kernfunktionalität)
+
+#### 1. Workflow Early Termination ⚠️
+**Status**: Nicht implementiert  
+**Priorität**: Hoch
+
+Wenn ein Connector einen Task mit folgenden Status markiert, sollte der Workflow automatisch beendet werden:
+- `ALREADY_IN_SMALL_GROUP` → Workflow abschließen, restliche Tasks stornieren
+- `CONTACT_ENDED` → Workflow abschließen, restliche Tasks stornieren
+
+**Zu implementieren in**: `backend/src/routes/task.ts` (nach Status-Update)
+
+```typescript
+// Nach Status-Update prüfen:
+if (status === 'ALREADY_IN_SMALL_GROUP' || status === 'CONTACT_ENDED') {
+  // 1. Workflow als completed markieren
+  // 2. Alle verbleibenden PENDING Tasks stornieren
+  // 3. Workflow beenden
+}
+```
+
+#### 2. API-Credentials konfigurieren ⚠️
+**Status**: Struktur vorhanden, Credentials fehlen  
+**Priorität**: Hoch
+
+Benötigt für funktionierende Benachrichtigungen:
+
+```env
+# Peoples App API
+PEOPLES_APP_API_KEY=your_api_key
+PEOPLES_APP_API_URL=https://api.peoplesapp.com
+
+# WhatsApp API
+WHATSAPP_API_KEY=your_api_key
+WHATSAPP_API_URL=https://api.whatsapp.com
+```
+
+**Datei**: `backend/.env`
+
+#### 3. Contact-to-Small-Group Assignment ⚠️
+**Status**: Nicht implementiert  
+**Priorität**: Hoch
+
+Kontakte sollten spezifischen Kleingruppen zugeordnet werden können:
+- `smallGroupId` Feld zum Contact-Model hinzufügen
+- Kleingruppenleiter-Zuordnung verbessern
+- Aktuell wird nur der erste verfügbare Leiter gefunden
+
+**Zu implementieren in**: 
+- `backend/prisma/schema.prisma` (Contact Model erweitern)
+- `backend/src/services/notificationService.ts` (Zuordnungslogik)
+
+### Mittelpriorität (Erweiterte Features)
+
+#### 4. Rescheduling-Funktionalität ⚠️
+**Status**: Status vorhanden, Logik fehlt  
+**Priorität**: Mittel
+
+Wenn `RESCHEDULED` gewählt wird:
+- Connector kann zukünftiges Datum setzen (z.B. 3 Monate später)
+- Neuer Workflow wird automatisch für dieses Datum erstellt
+- Aktueller Workflow wird pausiert
+
+**Zu implementieren in**: `backend/src/routes/task.ts`
+
+#### 5. Enhanced Dashboard Analytics ⚠️
+**Status**: Basis-Statistiken vorhanden  
+**Priorität**: Mittel
+
+Fehlende Metriken:
+- Conversion Rate (Kontakte → Kleingruppenmitglieder)
+- Connector-Performance (Task-Completion-Rate pro Connector)
+- Workflow-Status-Breakdown (nach Woche)
+- Kontaktquellen-Effektivität
+- Durchschnittliche Workflow-Dauer
+
+**Zu implementieren in**: `backend/src/routes/dashboard.ts`
+
+#### 6. Communication Method Tracking ⚠️
+**Status**: Nicht implementiert  
+**Priorität**: Niedrig
+
+Tracking wie Connector Kontakt aufgenommen hat:
+- WhatsApp
+- Telefonanruf
+- Persönlich
+- E-Mail
+
+**Zu implementieren in**: 
+- `backend/prisma/schema.prisma` (Task Model erweitern)
+- `frontend/src/pages/ConnectProcess.tsx` (UI hinzufügen)
+
+### Niedrigpriorität (Nice-to-Have)
+
+#### 7. Erweiterte Reporting-Features
+- Export-Funktionen (CSV, PDF)
+- Zeitraum-Filter für Analytics
+- Vergleichsansichten (Monat zu Monat)
+
+#### 8. Benachrichtigungs-Präferenzen
+- Connector kann Benachrichtigungsmethode wählen
+- E-Mail-Benachrichtigungen als Alternative
+- Benachrichtigungszeitpunkt konfigurierbar
+
+#### 9. Bulk-Operationen
+- Mehrere Kontakte gleichzeitig erstellen
+- Bulk-Status-Updates
+- Massen-Zuweisung zu Connectors
+
+#### 10. Audit-Log
+- Änderungshistorie für Kontakte
+- Task-Änderungsprotokoll
+- Benutzeraktivitäts-Log
+
+## 🛠 Technologie-Stack
+
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Sprache**: TypeScript
+- **Datenbank**: PostgreSQL
+- **ORM**: Prisma
+- **Authentifizierung**: JWT, Planning Center OAuth
+- **Cron Jobs**: node-cron
+- **HTTP Client**: Axios
+
+### Frontend
+- **Framework**: React
+- **Sprache**: TypeScript
+- **Routing**: React Router
+- **State Management**: Zustand
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
+- **Charts**: Recharts
+- **HTTP Client**: Axios
+
+### DevOps
+- **Containerisierung**: Docker & Docker Compose
+- **Datenbank**: PostgreSQL (Docker)
+
+## 🚀 Setup
+
+### Voraussetzungen
+- Node.js 18+ und npm
+- Docker & Docker Compose
+- Git
 
 ### Installation
 
-1. Install dependencies:
+1. **Repository klonen**
 ```bash
-npm run install:all
+git clone https://github.com/rtepass1986/reallifeberlin.git
+cd reallifeberlin
 ```
 
-2. Set up the database:
-
-**Option A: Using Docker (Recommended)**
+2. **Dependencies installieren**
 ```bash
-# Start PostgreSQL in Docker
+npm install
+```
+
+3. **Docker-Datenbank starten**
+```bash
 docker-compose up -d
-
-# Configure environment
-cd backend
-cp .env.example .env
-# Edit .env and set:
-# DATABASE_URL="postgresql://reallife_user:reallife_password@localhost:5432/reallife_db?schema=public"
 ```
 
-**Option B: Local PostgreSQL**
-```bash
-# Create database locally, then:
-cd backend
-cp .env.example .env
-# Edit .env with your database URL
+4. **Environment-Variablen konfigurieren**
+
+Erstelle `backend/.env`:
+```env
+# Datenbank
+DATABASE_URL="postgresql://reallife_user:reallife_password@localhost:5432/reallife_db?schema=public"
+
+# JWT
+JWT_SECRET="your-secret-key-here"
+
+# Planning Center (optional)
+PLANNING_CENTER_CLIENT_ID=your_client_id
+PLANNING_CENTER_CLIENT_SECRET=your_client_secret
+PLANNING_CENTER_REDIRECT_URI=http://localhost:5173/auth/callback
+
+# Peoples App API (optional, für Benachrichtigungen)
+PEOPLES_APP_API_KEY=your_api_key
+PEOPLES_APP_API_URL=https://api.peoplesapp.com
+
+# WhatsApp API (optional, für Benachrichtigungen)
+WHATSAPP_API_KEY=your_api_key
+WHATSAPP_API_URL=https://api.whatsapp.com
 ```
 
-3. Initialize the database:
+Erstelle `frontend/.env`:
+```env
+VITE_API_URL=http://localhost:3001
+```
+
+5. **Datenbank migrieren**
 ```bash
 cd backend
-npm run db:generate
-npm run db:migrate
+npx prisma generate
+npx prisma migrate dev
+```
+
+6. **Datenbank seeden (optional)**
+```bash
 npm run seed
 ```
 
-4. Start development servers:
+7. **Development-Server starten**
 ```bash
-# From root directory
+# Vom Root-Verzeichnis
 npm run dev
 ```
 
-This will start:
-- Backend server on http://localhost:3001
-- Frontend dev server on http://localhost:5173
+Die Anwendung läuft dann auf:
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3001
 
-## Environment Variables
+## 📁 Projektstruktur
 
-### Backend (.env)
-- `DATABASE_URL`: PostgreSQL connection string
-- `JWT_SECRET`: Secret key for JWT tokens
-- `JWT_EXPIRES_IN`: Token expiration (default: 7d)
-- `PLANNING_CENTER_API_KEY`: Planning Center API key
-- `PLANNING_CENTER_APP_ID`: Planning Center App ID
-- `PEOPLES_APP_API_KEY`: Peoples App API key
-- `PEOPLES_APP_API_URL`: Peoples App API URL
-- `WHATSAPP_API_KEY`: WhatsApp API key
-- `WHATSAPP_API_URL`: WhatsApp API URL
-- `PORT`: Backend server port (default: 3001)
-- `FRONTEND_URL`: Frontend URL for CORS (default: http://localhost:5173)
+```
+Reallife_App/
+├── backend/
+│   ├── prisma/
+│   │   └── schema.prisma          # Datenbankschema
+│   ├── src/
+│   │   ├── middleware/
+│   │   │   └── auth.ts            # JWT-Authentifizierung
+│   │   ├── routes/
+│   │   │   ├── auth.ts            # Authentifizierungs-Routes
+│   │   │   ├── contact.ts         # Kontakt-Routes
+│   │   │   ├── dashboard.ts       # Dashboard-Routes
+│   │   │   ├── kpi.ts             # KPI-Routes
+│   │   │   ├── missionPoint.ts    # Mission Point-Routes
+│   │   │   ├── task.ts            # Task-Routes
+│   │   │   └── workflow.ts        # Workflow-Routes
+│   │   ├── services/
+│   │   │   ├── cronService.ts     # Cron Jobs
+│   │   │   ├── notificationService.ts  # Benachrichtigungen
+│   │   │   ├── planningCenterAuth.ts   # Planning Center OAuth
+│   │   │   ├── planningCenterService.ts # Planning Center API
+│   │   │   └── workflowService.ts # Workflow-Logik
+│   │   ├── scripts/
+│   │   │   ├── seed.ts            # Datenbank-Seeding
+│   │   │   └── createTestUser.ts  # Test-User erstellen
+│   │   └── server.ts               # Express-Server
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── api/
+│   │   │   └── client.ts          # Axios-Client
+│   │   ├── components/
+│   │   │   └── Layout.tsx         # Haupt-Layout
+│   │   ├── pages/
+│   │   │   ├── Dashboard.tsx      # Dashboard-Seite
+│   │   │   ├── KPIManagement.tsx  # KPI-Verwaltung
+│   │   │   ├── ConnectProcess.tsx # Connect-Prozess
+│   │   │   ├── Login.tsx          # Login-Seite
+│   │   │   └── PlanningCenterCallback.tsx # OAuth-Callback
+│   │   ├── store/
+│   │   │   └── authStore.ts       # Zustand Store
+│   │   ├── App.tsx                # Haupt-App-Komponente
+│   │   └── main.tsx               # Entry Point
+│   └── package.json
+├── docker-compose.yml              # Docker-Konfiguration
+├── docker-init.sql                 # Datenbank-Initialisierung
+└── README.md                       # Diese Datei
+```
 
-### Frontend (.env)
-- `VITE_API_URL`: Backend API URL (default: http://localhost:3001)
+## 📚 API-Dokumentation
 
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login
-- `GET /api/auth/me` - Get current user
+### Authentifizierung
+- `POST /api/auth/register` - Benutzer registrieren
+- `POST /api/auth/login` - Lokale Anmeldung
+- `GET /api/auth/planning-center/authorize` - Planning Center OAuth starten
+- `POST /api/auth/planning-center/callback` - OAuth-Callback
+- `GET /api/auth/me` - Aktuellen Benutzer abrufen
 
 ### Mission Points
-- `GET /api/mission-points` - Get all mission points
-- `GET /api/mission-points/:id` - Get single mission point
-- `POST /api/mission-points` - Create mission point (Admin only)
-- `PUT /api/mission-points/:id` - Update mission point (Admin only)
-- `DELETE /api/mission-points/:id` - Delete mission point (Admin only)
+- `GET /api/mission-points` - Alle Mission Points abrufen
+- `POST /api/mission-points` - Mission Point erstellen
+- `PUT /api/mission-points/:id` - Mission Point aktualisieren
+- `DELETE /api/mission-points/:id` - Mission Point löschen
 
 ### KPIs
-- `GET /api/kpis` - Get all KPIs
-- `GET /api/kpis/:id` - Get single KPI with records
-- `POST /api/kpis` - Create KPI (Admin only)
-- `PUT /api/kpis/:id` - Update KPI (Admin only)
-- `DELETE /api/kpis/:id` - Delete KPI (Admin only)
-- `POST /api/kpis/:id/records` - Add KPI record
-- `GET /api/kpis/:id/records` - Get KPI records
+- `GET /api/kpis` - Alle KPIs abrufen
+- `POST /api/kpis` - KPI erstellen
+- `PUT /api/kpis/:id` - KPI aktualisieren
+- `DELETE /api/kpis/:id` - KPI löschen
+- `POST /api/kpis/:id/records` - KPI-Record hinzufügen
 
-### Contacts
-- `GET /api/contacts` - Get all contacts
-- `GET /api/contacts/:id` - Get single contact
-- `POST /api/contacts` - Create contact
-- `PUT /api/contacts/:id` - Update contact
-- `DELETE /api/contacts/:id` - Delete contact
+### Kontakte
+- `GET /api/contacts` - Alle Kontakte abrufen
+- `POST /api/contacts` - Kontakt erstellen (startet automatisch Workflow)
+- `GET /api/contacts/:id` - Einzelnen Kontakt abrufen
+- `PUT /api/contacts/:id` - Kontakt aktualisieren
 
 ### Tasks
-- `GET /api/tasks` - Get all tasks
-- `GET /api/tasks/:id` - Get single task
-- `PATCH /api/tasks/:id/status` - Update task status
+- `GET /api/tasks` - Alle Tasks abrufen (filterbar nach Status)
+- `GET /api/tasks/:id` - Einzelnen Task abrufen
+- `PATCH /api/tasks/:id/status` - Task-Status aktualisieren
 
 ### Workflows
-- `GET /api/workflows` - Get all workflows
-- `GET /api/workflows/:id` - Get single workflow
+- `GET /api/workflows` - Alle Workflows abrufen
+- `GET /api/workflows/:id` - Einzelnen Workflow abrufen
 
 ### Dashboard
-- `GET /api/dashboard` - Get dashboard data
-- `GET /api/dashboard/kpi-trends/:kpiId` - Get KPI trends
+- `GET /api/dashboard` - Dashboard-Daten abrufen
+- `GET /api/dashboard/kpi-trends/:kpiId` - KPI-Trends abrufen
 
-## Workflow System
+## 🔐 Authentifizierung
 
-The Connect Process uses an automated 4-week workflow:
+Aktuell ist die Authentifizierung **deaktiviert** für schnelleres Development. Um sie zu aktivieren:
 
-**Week 1:**
-- Monday: Send "Thanks for coming" message
-- Thursday: Remind to invite to service
+1. Entferne Kommentare in `frontend/src/App.tsx` (PrivateRoute)
+2. Entferne Kommentare in allen Backend-Routes (`authenticate` Middleware)
+3. Konfiguriere JWT_SECRET in `backend/.env`
 
-**Weeks 2-4:**
-- Thursday: Remind to invite to service
+## 📝 Notizen
 
-**Week 4:**
-- Friday: Status check - confirm if person joined small group
+- Die Anwendung ist vollständig auf **Deutsch** lokalisiert
+- Alle Datenbank-Migrationen werden mit Prisma verwaltet
+- Cron Jobs laufen automatisch im Hintergrund
+- Docker-Container müssen laufen, damit die Datenbank verfügbar ist
 
-Tasks are automatically created when a new contact is added (unless they're already registered for a small group).
+## 🤝 Beitragen
 
-## Cron Jobs
+1. Fork das Repository
+2. Erstelle einen Feature-Branch (`git checkout -b feature/AmazingFeature`)
+3. Committe deine Änderungen (`git commit -m 'Add some AmazingFeature'`)
+4. Push zum Branch (`git push origin feature/AmazingFeature`)
+5. Öffne einen Pull Request
 
-- Daily at 8 AM: Check for due tasks and send notifications
-- Weekly on Monday at 9 AM: Advance workflows to next week if all tasks are completed
+## 📄 Lizenz
 
-## User Roles
+Dieses Projekt ist für den internen Gebrauch der Reallife Kirche bestimmt.
 
-- `ADMIN`: Full access to all features
-- `CONNECTOR`: Can create contacts, manage assigned tasks
-- `SMALL_GROUP_LEADER`: Receives notifications when contacts join
-- `VIEWER`: Read-only access
+## 📞 Support
 
-## Development
+Bei Fragen oder Problemen, erstelle bitte ein Issue im GitHub Repository.
 
-### Backend
-```bash
-cd backend
-npm run dev  # Start with hot reload
-npm run build  # Build for production
-npm start  # Start production server
-npm run db:studio  # Open Prisma Studio
-```
+---
 
-### Frontend
-```bash
-cd frontend
-npm run dev  # Start dev server
-npm run build  # Build for production
-npm run preview  # Preview production build
-```
-
-## License
-
-MIT
+**Letzte Aktualisierung**: Januar 2025

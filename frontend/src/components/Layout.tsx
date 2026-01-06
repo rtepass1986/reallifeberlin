@@ -5,7 +5,7 @@ export default function Layout() {
 
   const navItems = [
     { path: '/', label: 'Dashboard' },
-    { path: '/kpis', label: 'KPI Verwaltung' },
+    { path: '/kpis', label: 'Kennzahlen' },
     { path: '/connect', label: 'Connect Prozess' }
   ];
 
@@ -16,7 +16,7 @@ export default function Layout() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-display font-bold tracking-tight text-blue-600">Reallife Church</h1>
+                <h1 className="text-xl font-display font-bold tracking-tight text-reallife-600">Reallife Church</h1>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 {navItems.map((item) => (
@@ -25,7 +25,7 @@ export default function Layout() {
                     to={item.path}
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium tracking-tight ${
                       location.pathname === item.path
-                        ? 'border-blue-600 text-blue-900'
+                        ? 'border-reallife-600 text-reallife-900'
                         : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
                     }`}
                   >

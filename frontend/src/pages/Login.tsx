@@ -41,7 +41,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-4xl font-display font-bold tracking-tighter text-blue-600">
+                  <h2 className="mt-6 text-center text-4xl font-display font-bold tracking-tighter text-reallife-600">
             Reallife Church App
           </h2>
           <p className="mt-2 text-center text-base tracking-tight text-slate-500">
@@ -78,7 +78,7 @@ export default function Login() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-300 placeholder-slate-400 text-slate-900 rounded-t-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-300 placeholder-slate-400 text-slate-900 rounded-t-md focus:outline-none focus:ring-2 focus:ring-reallife-500 focus:border-reallife-500 focus:z-10 sm:text-sm"
                 placeholder="E-Mail-Adresse"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -94,7 +94,7 @@ export default function Login() {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-300 placeholder-slate-400 text-slate-900 rounded-b-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-300 placeholder-slate-400 text-slate-900 rounded-b-md focus:outline-none focus:ring-2 focus:ring-reallife-500 focus:border-reallife-500 focus:z-10 sm:text-sm"
                 placeholder="Passwort"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -106,7 +106,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-base font-semibold rounded-2xl text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 active:text-white/70"
+                      className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-base font-semibold rounded-2xl text-white bg-reallife-600 hover:bg-reallife-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-reallife-500 disabled:opacity-50 active:text-white/70"
             >
               {loading ? 'Anmelden...' : 'Anmelden'}
             </button>
@@ -124,7 +124,7 @@ export default function Login() {
               type="button"
               onClick={handlePlanningCenterLogin}
               disabled={loading}
-              className="w-full flex justify-center py-4 px-4 border-2 border-blue-600 text-base font-semibold rounded-2xl text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                      className="w-full flex justify-center py-4 px-4 border-2 border-reallife-600 text-base font-semibold rounded-2xl text-reallife-600 bg-white hover:bg-reallife-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-reallife-500 disabled:opacity-50"
             >
               {loading ? 'Verbinden...' : 'Mit Planning Center anmelden'}
             </button>

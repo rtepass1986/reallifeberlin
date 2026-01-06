@@ -101,7 +101,7 @@ export default function KPIManagement() {
         </div>
         <button
           onClick={() => setShowKPIForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  className="bg-reallife-600 text-white px-4 py-2 rounded-md hover:bg-reallife-700"
         >
           KPI erstellen
         </button>
@@ -265,14 +265,14 @@ export default function KPIManagement() {
                           setSelectedKPI(kpi.id);
                           setShowRecordForm(true);
                         }}
-                        className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                        className="text-sm bg-reallife-600 text-white px-3 py-1 rounded hover:bg-reallife-700"
                       >
                         Eintrag hinzufügen
                       </button>
                     </div>
                     {latestRecord && (
                       <div className="mt-2">
-                        <div className="text-2xl font-bold text-blue-600">
+                        <div className="text-2xl font-bold text-reallife-600">
                           {latestRecord.value.toLocaleString()}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">

@@ -127,7 +127,7 @@ export default function Dashboard() {
       <div className="px-4 py-6 sm:px-0">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-reallife-600 mx-auto"></div>
             <p className="mt-4 text-slate-500">Dashboard-Daten werden geladen...</p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function Dashboard() {
   return (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-8">
-        <h1 className="text-4xl font-display font-bold tracking-tighter text-blue-600">Dashboard</h1>
+                <h1 className="text-4xl font-display font-bold tracking-tighter text-reallife-600">Dashboard</h1>
         <p className="mt-2 text-lg tracking-tight text-slate-500">
           Übersicht über Mission Points, KPIs und Connect-Prozess Statistiken
         </p>
@@ -162,12 +162,12 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">Kontakte gesamt</p>
-                <p className="mt-2 text-3xl font-display font-bold text-blue-600">
+                        <p className="mt-2 text-3xl font-display font-bold text-reallife-600">
                   {data.statistics.totalContacts.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-blue-50 rounded-xl">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-3 bg-reallife-50 rounded-xl">
+                <svg className="w-6 h-6 text-reallife-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
@@ -216,14 +216,14 @@ export default function Dashboard() {
       <div className="space-y-8">
         {data.missionPoints.map((missionPoint, index) => (
           <div key={missionPoint.id} className="bg-white shadow-lg rounded-2xl border border-slate-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                    <div className="bg-gradient-to-r from-reallife-600 to-reallife-700 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-display font-bold tracking-tight text-white">
                     {missionPoint.name}
                   </h2>
                   {missionPoint.description && (
-                    <p className="mt-1 text-sm text-blue-100">{missionPoint.description}</p>
+                    <p className="mt-1 text-sm text-reallife-100">{missionPoint.description}</p>
                   )}
                 </div>
                 <div className="text-4xl font-bold text-white/20">
@@ -242,7 +242,7 @@ export default function Dashboard() {
                     return (
                       <div
                         key={kpi.id}
-                        className="border-2 border-slate-200 rounded-xl p-5 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all bg-gradient-to-br from-white to-slate-50"
+                        className="border-2 border-slate-200 rounded-xl p-5 cursor-pointer hover:border-reallife-500 hover:shadow-md transition-all bg-gradient-to-br from-white to-slate-50"
                         onClick={() => setSelectedKPI(kpi.id)}
                       >
                         <h3 className="text-base font-semibold text-slate-900 mb-3">
@@ -252,11 +252,11 @@ export default function Dashboard() {
                           <p className="text-xs text-slate-500 mb-3">{kpi.description}</p>
                         )}
                         <div className="flex items-baseline justify-between">
-                          <div className="text-3xl font-display font-bold text-blue-600">
+                                  <div className="text-3xl font-display font-bold text-reallife-600">
                             {currentValue.toLocaleString()}
                           </div>
                           {selectedKPI === kpi.id && (
-                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                    <div className="w-2 h-2 bg-reallife-600 rounded-full"></div>
                           )}
                         </div>
                         {latestRecord && (
@@ -319,14 +319,14 @@ export default function Dashboard() {
                 }}
               />
               <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="value" 
-                stroke="#2563eb" 
-                strokeWidth={3}
-                dot={{ fill: '#2563eb', r: 4 }}
-                activeDot={{ r: 6 }}
-              />
+                      <Line 
+                        type="monotone" 
+                        dataKey="value" 
+                        stroke="#0d7aff" 
+                        strokeWidth={3}
+                        dot={{ fill: '#0d7aff', r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
             </LineChart>
           </ResponsiveContainer>
         </div>

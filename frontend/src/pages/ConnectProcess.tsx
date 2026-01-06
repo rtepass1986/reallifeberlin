@@ -120,7 +120,7 @@ export default function ConnectProcess() {
         </div>
         <button
           onClick={() => setShowContactForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  className="bg-reallife-600 text-white px-4 py-2 rounded-md hover:bg-reallife-700"
         >
           Neuer Kontakt
         </button>
