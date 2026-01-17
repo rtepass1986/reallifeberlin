@@ -1,37 +1,38 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import pool from '../db.js';
 import { authenticate } from '../middleware/auth.js';
 import { planningCenterAuth } from '../services/planningCenterAuth.js';
 import { planningCenterService } from '../services/planningCenterService.js';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // Register
 router.post('/register', async (req, res) => {
   try {
     const { email, password, name, role } = req.body;
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    const existingUserResult = await pool.query(
+      'SELECT * FROM "User" WHERE email = $1',
+      [email]
+    );
 
-    if (existingUser) {
+    if (existingUserResult.rows.length > 0) {
       return res.status(400).json({ error: 'User already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const id = `user-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name,
-        role: role || 'VIEWER'
-      }
-    });
+    const result = await pool.query(
+      `INSERT INTO "User" (id, email, password, name, role, "createdAt", "updatedAt")
+       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+       RETURNING *`,
+      [id, email, hashedPassword, name, role || 'VIEWER']
+    );
+
+    const user = result.rows[0];
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
@@ -76,11 +77,12 @@ router.post('/login', async (req, res) => {
     }
 
     // Regular login with local credentials
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
+    const userResult = await pool.query(
+      'SELECT * FROM "User" WHERE email = $1',
+      [email]
+    );
 
-    if (!user) {
+    if (userResult.rows.length === 0) {
       // Try to find user in Planning Center and create account
       const planningCenterPerson = await planningCenterService.findPersonByEmail(email);
       
@@ -93,6 +95,8 @@ router.post('/login', async (req, res) => {
       
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    const user = userResult.rows[0];
 
     // If user has no password (OAuth user), they need to use Planning Center login
     if (!user.password) {
@@ -199,21 +203,16 @@ router.post('/planning-center/callback', async (req, res) => {
 // Get current user
 router.get('/me', authenticate, async (req: any, res) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true
-      }
-    });
+    const result = await pool.query(
+      'SELECT id, email, name, role FROM "User" WHERE id = $1',
+      [req.userId]
+    );
 
-    if (!user) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json(user);
+    res.json(result.rows[0]);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

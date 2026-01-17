@@ -1,7 +1,5 @@
 import axios from 'axios';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import pool from '../db.js';
 
 interface PlanningCenterConfig {
   apiKey: string;
@@ -85,13 +83,16 @@ export class PlanningCenterService {
 
   async syncContactToPlanningCenter(contactId: string) {
     try {
-      const contact = await prisma.contact.findUnique({
-        where: { id: contactId }
-      });
+      const contactResult = await pool.query(
+        'SELECT * FROM "Contact" WHERE id = $1',
+        [contactId]
+      );
 
-      if (!contact) {
+      if (contactResult.rows.length === 0) {
         throw new Error('Contact not found');
       }
+
+      const contact = contactResult.rows[0];
 
       // Create person in Planning Center
       const nameParts = contact.name.split(' ');

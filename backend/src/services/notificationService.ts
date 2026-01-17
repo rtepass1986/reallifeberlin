@@ -1,7 +1,5 @@
 import axios from 'axios';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import pool from '../db.js';
 
 interface NotificationData {
   [key: string]: any;
@@ -38,13 +36,33 @@ export async function sendNotification(
       const task = data.task;
 
       // Find small group leader for this contact
-      // In a real implementation, you'd link contacts to small groups
-      // For now, we'll try to find a small group leader
-      const smallGroupLeader = await prisma.smallGroupLeader.findFirst({
-        include: {
-          user: true
+      // First try to find the leader for the contact's small group
+      let smallGroupLeader = null;
+      if (contact.smallGroupId) {
+        const leaderResult = await pool.query(
+          `SELECT sgl.*, u.name as user_name, u.email as user_email
+           FROM "SmallGroupLeader" sgl
+           LEFT JOIN "User" u ON sgl."userId" = u.id
+           WHERE sgl.id = $1`,
+          [contact.smallGroupId]
+        );
+        if (leaderResult.rows.length > 0) {
+          smallGroupLeader = leaderResult.rows[0];
         }
-      });
+      }
+
+      // If no specific leader found, get the first available leader
+      if (!smallGroupLeader) {
+        const leaderResult = await pool.query(
+          `SELECT sgl.*, u.name as user_name, u.email as user_email
+           FROM "SmallGroupLeader" sgl
+           LEFT JOIN "User" u ON sgl."userId" = u.id
+           LIMIT 1`
+        );
+        if (leaderResult.rows.length > 0) {
+          smallGroupLeader = leaderResult.rows[0];
+        }
+      }
 
       const whatsappNumber = smallGroupLeader?.whatsapp || contact.phone;
 

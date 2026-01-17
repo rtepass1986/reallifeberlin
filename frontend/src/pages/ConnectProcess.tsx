@@ -36,11 +36,16 @@ export default function ConnectProcess() {
   const [loading, setLoading] = useState(true);
   const [showContactForm, setShowContactForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
+    address: '',
+    city: '',
+    postalCode: '',
     district: '',
     area: '',
+    notes: '',
     source: 'SUNDAY_SERVICE',
     classification: 'NAME_CHRISTIAN',
     registeredForSmallGroup: false
@@ -74,13 +79,33 @@ export default function ConnectProcess() {
   const handleCreateContact = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/api/contacts', formData);
+      // Combine first name and last name into name field
+      const name = `${formData.firstName} ${formData.lastName}`.trim() || formData.firstName || formData.lastName;
+      await api.post('/api/contacts', {
+        name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        postalCode: formData.postalCode,
+        district: formData.district,
+        area: formData.area,
+        notes: formData.notes,
+        source: formData.source,
+        classification: formData.classification,
+        registeredForSmallGroup: formData.registeredForSmallGroup
+      });
       setFormData({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phone: '',
+        address: '',
+        city: '',
+        postalCode: '',
         district: '',
         area: '',
+        notes: '',
         source: 'SUNDAY_SERVICE',
         classification: 'NAME_CHRISTIAN',
         registeredForSmallGroup: false
@@ -120,7 +145,7 @@ export default function ConnectProcess() {
         </div>
         <button
           onClick={() => setShowContactForm(true)}
-                  className="bg-reallife-600 text-white px-4 py-2 rounded-md hover:bg-reallife-700"
+                  className="bg-accent-500 text-white px-6 py-2.5 rounded-md hover:bg-accent-600 transition-colors duration-200 font-medium shadow-sm"
         >
           Neuer Kontakt
         </button>
@@ -129,21 +154,36 @@ export default function ConnectProcess() {
       {/* Create Contact Modal */}
       {showContactForm && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
+          <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold mb-4">Neuer Kontakt</h3>
             <form onSubmit={handleCreateContact}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Vorname *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nachname *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    required
+                  />
+                </div>
               </div>
+              
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   E-Mail
@@ -153,8 +193,10 @@ export default function ConnectProcess() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  placeholder="beispiel@email.com"
                 />
               </div>
+              
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Telefon
@@ -164,33 +206,78 @@ export default function ConnectProcess() {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  placeholder="+49 30 12345678"
                 />
               </div>
+              
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Bezirk
+                  Adresse
                 </label>
                 <input
                   type="text"
-                  value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  placeholder="Straße und Hausnummer"
                 />
               </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Gebiet
-                </label>
-                <input
-                  type="text"
-                  value={formData.area}
-                  onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
-                />
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Stadt
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    placeholder="Berlin"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    PLZ
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.postalCode}
+                    onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    placeholder="10115"
+                  />
+                </div>
               </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Bezirk
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.district}
+                    onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gebiet
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.area}
+                    onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  />
+                </div>
+              </div>
+              
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Source
+                  Quelle
                 </label>
                 <select
                   value={formData.source}
@@ -204,9 +291,10 @@ export default function ConnectProcess() {
                   <option value="INSTAGRAM">Instagram</option>
                 </select>
               </div>
+              
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Classification
+                  Klassifizierung
                 </label>
                 <select
                   value={formData.classification}
@@ -217,6 +305,20 @@ export default function ConnectProcess() {
                   <option value="NAME_CHRISTIAN">Name Christ</option>
                 </select>
               </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Notizen
+                </label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Zusätzliche Informationen..."
+                />
+              </div>
+              
               <div className="mb-4">
                 <label className="flex items-center">
                   <input
@@ -234,11 +336,16 @@ export default function ConnectProcess() {
                   onClick={() => {
                     setShowContactForm(false);
                     setFormData({
-                      name: '',
+                      firstName: '',
+                      lastName: '',
                       email: '',
                       phone: '',
+                      address: '',
+                      city: '',
+                      postalCode: '',
                       district: '',
                       area: '',
+                      notes: '',
                       source: 'SUNDAY_SERVICE',
                       classification: 'NAME_CHRISTIAN',
                       registeredForSmallGroup: false
@@ -250,7 +357,7 @@ export default function ConnectProcess() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-6 py-2.5 bg-accent-500 text-white rounded-md hover:bg-accent-600 transition-colors duration-200 font-medium shadow-sm"
                 >
                   Kontakt erstellen
                 </button>

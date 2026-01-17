@@ -49,7 +49,7 @@ export default function PlanningCenterCallback() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-reallife-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-reallife-500 mx-auto"></div>
           <p className="mt-4 text-slate-500">Authentifizierung wird abgeschlossen...</p>
         </div>
       </div>
@@ -66,7 +66,7 @@ export default function PlanningCenterCallback() {
           </div>
           <button
             onClick={() => navigate('/login')}
-                    className="mt-4 w-full py-2 px-4 bg-reallife-600 text-white rounded-md hover:bg-reallife-700"
+                    className="mt-4 w-full py-2.5 px-6 bg-accent-500 text-white rounded-md hover:bg-accent-600 transition-colors duration-200 font-medium shadow-sm"
           >
             Zurück zur Anmeldung
           </button>

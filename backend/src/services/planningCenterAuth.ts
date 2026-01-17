@@ -1,7 +1,5 @@
 import axios from 'axios';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import pool from '../db.js';
 
 interface PlanningCenterOIDCConfig {
   clientId: string;
@@ -99,30 +97,32 @@ export class PlanningCenterAuth {
       const name = planningCenterUser.name || `${planningCenterUser.given_name || ''} ${planningCenterUser.family_name || ''}`.trim() || email;
 
       // Check if user exists
-      let user = await prisma.user.findUnique({
-        where: { email }
-      });
+      const existingUserResult = await pool.query(
+        'SELECT * FROM "User" WHERE email = $1',
+        [email]
+      );
 
-      if (!user) {
+      let user;
+      if (existingUserResult.rows.length === 0) {
         // Create new user from Planning Center
-        user = await prisma.user.create({
-          data: {
-            email,
-            name,
-            password: '', // No password needed for OAuth users
-            role: 'VIEWER', // Default role, can be updated by admin
-            // Store Planning Center ID if needed
-          }
-        });
+        const id = `user-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        const result = await pool.query(
+          `INSERT INTO "User" (id, email, name, password, role, "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+           RETURNING *`,
+          [id, email, name, '', 'VIEWER']
+        );
+        user = result.rows[0];
       } else {
         // Update user info from Planning Center
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            name,
-            // Update other fields as needed
-          }
-        });
+        const result = await pool.query(
+          `UPDATE "User" 
+           SET name = $1, "updatedAt" = NOW()
+           WHERE id = $2
+           RETURNING *`,
+          [name, existingUserResult.rows[0].id]
+        );
+        user = result.rows[0];
       }
 
       return user;

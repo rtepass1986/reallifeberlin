@@ -34,37 +34,38 @@ export default {
         '2xl': '40rem',
       },
       colors: {
-        // Reallife Berlin Corporate Colors
+        // Reallife Berlin Corporate Colors (basierend auf reallifeberlin.de)
         reallife: {
-          50: '#f0f7ff',
-          100: '#e0efff',
-          200: '#b8ddff',
-          300: '#7bc2ff',
-          400: '#369eff',
-          500: '#0d7aff', // Primary brand blue - warm and welcoming
-          600: '#005ce6',
-          700: '#0047b3',
-          800: '#003786',
-          900: '#002d5c',
+          50: '#f5f5f5',
+          100: '#e8e8e8',
+          200: '#d1d1d1',
+          300: '#b3b3b3',
+          400: '#999999',
+          500: '#000000', // Primary: Schwarz (Corporate Color)
+          600: '#000000',
+          700: '#000000',
+          800: '#000000',
+          900: '#000000',
         },
-        // Warm accent color for highlights
+        // Accent color für CTAs und Highlights
         accent: {
-          50: '#fef3f2',
-          100: '#fde4e1',
-          200: '#fbcec8',
-          300: '#f8a8a0',
-          400: '#f4756a',
-          500: '#f04a3c', // Warm red accent
-          600: '#de2e1f',
-          700: '#b92316',
-          800: '#981f15',
-          900: '#7d1f17',
+          50: '#fff5f5',
+          100: '#ffe3e3',
+          200: '#ffc9c9',
+          300: '#ffa8a8',
+          400: '#ff8787',
+          500: '#ff0000', // Rot - Berlin Flag inspired
+          600: '#e60000',
+          700: '#cc0000',
+          800: '#b30000',
+          900: '#990000',
         },
-        // Berlin-inspired colors (from flag)
+        // Berlin-inspired colors
         berlin: {
           red: '#FF0000',
           black: '#000000',
           white: '#FFFFFF',
+          gray: '#F7F7F7',
         },
         blue: {
           50: '#eff6ff',
